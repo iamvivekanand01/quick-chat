@@ -77,12 +77,12 @@ export const AuthProvider = ({ children }) => {
   const connectSocket = (userData) => {
   if (!userData || socket?.connected) return;
 
-  //Remove trailing slashes if present
-  const cleanUrl = backendUrl?.replace(/\/+$/, "");
+  let cleanUrl = backendUrl?.replace(/\/+$/, "");
 
   if (cleanUrl.startsWith("https://https")) {
-  cleanUrl = cleanUrl.replace("https://https", "https://");
+    cleanUrl = cleanUrl.replace("https://https", "https://");
   }
+
   console.log("Connecting to socket at:\t", cleanUrl);
   console.log("With userId:", userData._id);
 
@@ -100,6 +100,7 @@ export const AuthProvider = ({ children }) => {
     setOnlineUsers(userIds);
   });
 };
+
 
   // Clean up socket on unmount
   useEffect(() => {
