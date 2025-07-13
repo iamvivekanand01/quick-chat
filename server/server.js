@@ -7,7 +7,6 @@ import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import { Server } from "socket.io";
 
-
 // Create Express app and HTTP Server
 const app = express();
 const server = http.createServer(app);
@@ -39,7 +38,17 @@ io.on("connection", (socket) => {
 
 // Middleware
 app.use(express.json({ limit: "4mb" }));
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://quick-chat-h7n0yj8jf-vivekanands-projects-f4e1fd67.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
 // Routes setup
 app.use("/api/status", (req, res) => res.send("Server is Live"));
