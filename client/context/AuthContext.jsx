@@ -79,12 +79,15 @@ export const AuthProvider = ({ children }) => {
   const connectSocket = (userData) => {
     if (!userData || socket?.connected) return;
 
-    console.log("Connecting to socket at:", backendUrl);
-    console.log("With userId:", userData._id);
-    const newSocket = io(backendUrl, {
+
+    const cleanUrl = backendUrl?.replace(/\/+$/, "");
+     console.log("Connecting to socket at:", cleanUrl);
+  console.log("With userId:", userData._id);
+    const newSocket = io(cleanUrl, {
       query: {
         userId: userData._id,
       },
+      transports: ["websocket"],
     });
     newSocket.connect();
     setSocket(newSocket);
