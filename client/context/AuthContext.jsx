@@ -75,56 +75,28 @@ export const AuthProvider = ({ children }) => {
 
   // Improved socket connection function
   const connectSocket = (userData) => {
-    if (!userData?._id) {
-      console.error("No user ID provided for socket connection");
-      return;
-    }
+  if (!userData || socket?.connected) return;
 
-    if (socket?.connected) {
-      console.log("Socket already connected");
-      return;
-    }
+  //Remove trailing slashes if present
+  const cleanUrl = backendUrl?.replace(/\/+$/, "");
 
-    // Clean and validate backend URL
-    let cleanUrl = backendUrl;
-    try {
-      cleanUrl = new URL(backendUrl).origin;
-    } catch (e) {
-      console.error("Invalid backend URL:", backendUrl);
-      return;
-    }
+  console.log("Connecting to socket at:\t", cleanUrl);
+  console.log("With userId:", userData._id);
 
-    console.log("Connecting to socket at:", cleanUrl);
-    console.log("With userId:", userData._id);
+  const newSocket = io(cleanUrl, {
+    query: {
+      userId: userData._id,
+    },
+    transports: ["websocket"],
+  });
 
-    const newSocket = io(cleanUrl, {
-      query: { userId: userData._id },
-      transports: ["websocket"],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
+  newSocket.connect();
+  setSocket(newSocket);
 
-    // Set up event listeners
-    newSocket.on("connect", () => {
-      console.log("Socket connected:", newSocket.id);
-    });
-
-    newSocket.on("connect_error", (err) => {
-      console.error("Socket connection error:", err.message);
-    });
-
-    newSocket.on("disconnect", (reason) => {
-      console.log("Socket disconnected:", reason);
-    });
-
-    newSocket.on("getOnlineUsers", (userIds) => {
-      console.log("Online users updated:", userIds);
-      setOnlineUsers(userIds);
-    });
-
-    setSocket(newSocket);
-  };
+  newSocket.on("getOnlineUsers", (userIds) => {
+    setOnlineUsers(userIds);
+  });
+};
 
   // Clean up socket on unmount
   useEffect(() => {
