@@ -83,8 +83,8 @@ export const AuthProvider = ({ children }) => {
     cleanUrl = cleanUrl.replace("https://https", "https://");
   }
 
-  console.log("Connecting to socket at:\t", cleanUrl);
-  console.log("With userId:", userData._id);
+  console.log("🟢 Connecting to socket at:", cleanUrl);
+  console.log("🟢 With userId:", userData._id);
 
   const newSocket = io(cleanUrl, {
     query: {
@@ -93,11 +93,18 @@ export const AuthProvider = ({ children }) => {
     transports: ["websocket"],
   });
 
-  newSocket.connect();
+  newSocket.on("connect", () => {
+    console.log("✅ WebSocket connected:", newSocket.id);
+  });
+
+  newSocket.on("connect_error", (err) => {
+    console.log("❌ WebSocket connect error:", err.message);
+  });
+
   setSocket(newSocket);
 
   newSocket.on("getOnlineUsers", (userIds) => {
-    console.log("Online users received via socket:", userIds);
+    console.log("📨 Online users via socket:", userIds);
     setOnlineUsers(userIds);
   });
 };
