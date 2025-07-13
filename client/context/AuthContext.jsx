@@ -61,8 +61,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Update profile function to handle user profile updates
-
   const updateProfile = async (body) => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", body);
@@ -75,36 +73,74 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Connect socket function to handle socket connection and online users updates
+  // Improved socket connection function
   const connectSocket = (userData) => {
-  if (!userData || socket?.connected) return;
+    if (!userData?._id) {
+      console.error("No user ID provided for socket connection");
+      return;
+    }
 
-  // Remove trailing slash if accidentally added in .env
-  const cleanUrl = backendUrl?.replace(/\/+$/, "");
+    if (socket?.connected) {
+      console.log("Socket already connected");
+      return;
+    }
 
-  console.log("Connecting to socket at:", cleanUrl);
-  console.log("With userId:", userData._id);
+    // Clean and validate backend URL
+    let cleanUrl = backendUrl;
+    try {
+      cleanUrl = new URL(backendUrl).origin;
+    } catch (e) {
+      console.error("Invalid backend URL:", backendUrl);
+      return;
+    }
 
-  const newSocket = io(cleanUrl, {
-    query: { userId: userData._id },
-    transports: ["websocket"],
-  });
+    console.log("Connecting to socket at:", cleanUrl);
+    console.log("With userId:", userData._id);
 
-  newSocket.connect();
-  setSocket(newSocket);
+    const newSocket = io(cleanUrl, {
+      query: { userId: userData._id },
+      transports: ["websocket"],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
 
-  newSocket.on("getOnlineUsers", (userIds) => {
-    setOnlineUsers(userIds);
-  });
-};
+    // Set up event listeners
+    newSocket.on("connect", () => {
+      console.log("Socket connected:", newSocket.id);
+    });
 
+    newSocket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err.message);
+    });
+
+    newSocket.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+    });
+
+    newSocket.on("getOnlineUsers", (userIds) => {
+      console.log("Online users updated:", userIds);
+      setOnlineUsers(userIds);
+    });
+
+    setSocket(newSocket);
+  };
+
+  // Clean up socket on unmount
+  useEffect(() => {
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["token"] = token;
+      checkAuth();
     }
-    checkAuth();
-  }, []);
+  }, [token]);
 
   const value = {
     axios,
@@ -115,5 +151,6 @@ export const AuthProvider = ({ children }) => {
     updateProfile,
     login,
   };
+  
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
