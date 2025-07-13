@@ -80,6 +80,9 @@ export const AuthProvider = ({ children }) => {
   //Remove trailing slashes if present
   const cleanUrl = backendUrl?.replace(/\/+$/, "");
 
+  if (cleanUrl.startsWith("https://https")) {
+  cleanUrl = cleanUrl.replace("https://https", "https://");
+  }
   console.log("Connecting to socket at:\t", cleanUrl);
   console.log("With userId:", userData._id);
 
