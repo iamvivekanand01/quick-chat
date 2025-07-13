@@ -40,7 +40,7 @@ io.on("connection", (socket) => {
 app.use(express.json({ limit: "4mb" }));
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://quick-chat-h7n0yj8jf-vivekanands-projects-f4e1fd67.vercel.app",
+  "https://quick-chat-one-flax.vercel.app",
 ];
 
 app.use(
