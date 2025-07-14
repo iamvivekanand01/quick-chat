@@ -17,10 +17,10 @@ A real-time full-stack chat application built using the MERN stack (MongoDB, Exp
 
 ---
 
-## 🖼️ UI Preview
+## 🌐 Live Demo
 
-<!-- Replace after deployment -->
-<!-- ![QuickChat UI Preview](https://your-image-link-if-hosted.png) -->
+- 🔗 **Frontend (Vercel):** [https://quick-chat-one-flax.vercel.app](https://quick-chat-one-flax.vercel.app)
+- 🔗 **Backend (Render):** [https://quick-chat-backend-31z1.onrender.com](https://quick-chat-backend-31z1.onrender.com)
 
 ---
 
@@ -69,7 +69,7 @@ Create `.env` files in both `client/` and `server/` directories.
 **Client:**
 
 \`\`\`env
-VITE_BACKEND_URL=https://your-backend-url.onrender.com
+VITE_BACKEND_URL=https://quick-chat-backend-31z1.onrender.com
 \`\`\`
 
 **Server:**
@@ -93,8 +93,9 @@ CLOUDINARY_API_SECRET=your-api-secret
 ### 1. Clone the repo
 
 \`\`\`bash
-git clone https://github.com/your-username/quickchat.git
-cd quickchat
+git clone https://github.com/iamvivekanand01/quick-chat.git
+cd quick-chat
+
 \`\`\`
 
 ### 2. Setup server
@@ -116,10 +117,8 @@ npm run dev
 ---
 
 ## 🌍 Deployment
-
-### Frontend → [Vercel](https://vercel.com)
-
-### Backend → [Render](https://render.com)
+- Frontend hosted on **Vercel**
+- Backend hosted on **Render**
 
 ---
 
@@ -130,6 +129,17 @@ Made with 💜 by **Vivekanand**
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://linkedin.com/in/iamvivekanand01)
 
 ---
+
+
+## ⚠️ Known Issue
+
+> 💡 You might see this warning in the browser console:
+WebSocket connection to 'wss://https/socket.io/?...' failed
+
+
+✅ This doesn't break functionality — messages, login, and all major features work. This is due to an internal Socket.IO connection formatting issue and will be patched soon.
+
+
 
 ## 📄 License
 
