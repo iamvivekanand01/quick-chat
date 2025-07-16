@@ -77,47 +77,48 @@ export const AuthProvider = ({ children }) => {
   const connectSocket = (userData) => {
   if (!userData || socket?.connected) return;
 
-  let cleanUrl = backendUrl?.replace(/\/+$/, "");
+  let baseURL = backendUrl?.replace(/\/+$/, "");
 
-  if (cleanUrl.startsWith("https://https")) {
-    cleanUrl = cleanUrl.replace("https://https", "https://");
+  if (baseURL.startsWith("https://https") || baseURL.startsWith("http://https")) {
+    baseURL = baseURL.replace("https://https", "https://").replace("http://https", "https://");
   }
 
-  console.log("🟢 Connecting to socket at:", cleanUrl);
-  console.log("🟢 With userId:", userData._id);
+  console.log("Connecting to socket at:", baseURL);
+  console.log("With userId:", userData._id);
 
-  const newSocket = io(cleanUrl, {
-    query: {
-      userId: userData._id,
-    },
+  const newSocket = io(baseURL, {
+    query: { userId: userData._id },
     transports: ["websocket"],
   });
 
+  //Add these logs to debug
   newSocket.on("connect", () => {
-    console.log("✅ WebSocket connected:", newSocket.id);
+    console.log(" WebSocket connected!");
   });
 
   newSocket.on("connect_error", (err) => {
-    console.log("❌ WebSocket connect error:", err.message);
+    console.error("WebSocket connection error:", err.message);
+  });
+
+  newSocket.on("getOnlineUsers", (userIds) => {
+    console.log("Online users via socket:", userIds);
+    setOnlineUsers(userIds);
   });
 
   setSocket(newSocket);
-
-  newSocket.on("getOnlineUsers", (userIds) => {
-    console.log("📨 Online users via socket:", userIds);
-    setOnlineUsers(userIds);
-  });
 };
 
 
   // Clean up socket on unmount
   useEffect(() => {
-    return () => {
-      if (socket) {
-        socket.disconnect();
-      }
-    };
-  }, [socket]);
+  return () => {
+    if (socket?.connected) {
+      socket.disconnect();
+      console.log("Socket disconnected on unmount");
+    }
+  };
+}, []); // empty deps → only runs on unmount
+
 
   useEffect(() => {
     if (token) {

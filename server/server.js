@@ -6,6 +6,9 @@ import { connectDB } from "./lib/db.js";
 import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import { Server } from "socket.io";
+import { config } from "dotenv";
+
+config();
 
 // Allowed frontend URLs
 const allowedOrigins = [
@@ -17,10 +20,10 @@ const allowedOrigins = [
 const app = express();
 const server = http.createServer(app);
 
-// ✅ CORS Middleware (before any routes)
+// CORS Middleware (before any routes)
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin:  (origin, callback)=> {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -42,7 +45,7 @@ app.use("/api/messages", messageRouter);
 // Connect to MongoDB
 await connectDB();
 
-// ✅ Socket.io server
+// Socket.io server
 export const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
