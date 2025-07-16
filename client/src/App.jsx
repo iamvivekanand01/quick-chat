@@ -10,7 +10,17 @@ const App = () => {
   const { authUser } = useContext(AuthContext);
   return (
     <div className="bg-[url('/bgImage.svg')] bg-contain">
-      <Toaster />
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#1f1f1f",
+            color: "#fff",
+          },
+        }}
+      />
       <Routes>
         <Route
           path="/"
@@ -24,6 +34,8 @@ const App = () => {
           path="/profile"
           element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
         />
+        <Route path="*" 
+        element={<Navigate to="/" />} />
       </Routes>
     </div>
   );
