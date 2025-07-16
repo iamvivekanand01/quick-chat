@@ -16,25 +16,20 @@ const allowedOrigins = [
   "https://quick-chat-one-flax.vercel.app",
 ];
 
-// Create Express app and HTTP Server
 const app = express();
 const server = http.createServer(app);
 
-// CORS Middleware (before any routes)
+// Fixed CORS Configuration
 app.use(
   cors({
-    origin:  (origin, callback)=> {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "token"],
   })
 );
+app.options("*", cors()); // Handle preflight
 
-// JSON parser
 app.use(express.json({ limit: "4mb" }));
 
 // Routes
@@ -42,10 +37,13 @@ app.use("/api/status", (req, res) => res.send("Server is Live"));
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
 
+// Optional: keep alive ping
+app.get("/ping", (req, res) => res.send("pong"));
+
 // Connect to MongoDB
 await connectDB();
 
-// Socket.io server
+// Socket.io config with CORS
 export const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -54,7 +52,7 @@ export const io = new Server(server, {
   },
 });
 
-export const userSocketMap = {}; // {userId: socketId}
+export const userSocketMap = {};
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
