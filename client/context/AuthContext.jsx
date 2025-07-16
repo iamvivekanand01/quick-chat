@@ -75,39 +75,36 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Improved socket connection function
-  const connectSocket = (userData) => {
+ const connectSocket = (userData) => {
   if (!userData || socket?.connected) return;
 
-  let baseURL = backendUrl?.replace(/\/+$/, "");
+  const baseURL = import.meta.env.VITE_BACKEND_URL?.trim();
 
-  if (baseURL.startsWith("https://https") || baseURL.startsWith("http://https")) {
-    baseURL = baseURL.replace("https://https", "https://").replace("http://https", "https://");
-  }
-
-  console.log("Connecting to socket at:", baseURL);
-  console.log("With userId:", userData._id);
+  // Debugging logs
+  console.log("🟢 Connecting to socket at:", baseURL);
+  console.log("🟢 With userId:", userData._id);
 
   const newSocket = io(baseURL, {
     query: { userId: userData._id },
     transports: ["websocket"],
   });
 
-  //Add these logs to debug
   newSocket.on("connect", () => {
-    console.log(" WebSocket connected!");
+    console.log("✅ WebSocket connected!");
   });
 
   newSocket.on("connect_error", (err) => {
-    console.error("WebSocket connection error:", err.message);
+    console.error("❌ WebSocket connect error:", err.message);
   });
 
   newSocket.on("getOnlineUsers", (userIds) => {
-    console.log("Online users via socket:", userIds);
+    console.log("✅ Online users:", userIds);
     setOnlineUsers(userIds);
   });
 
   setSocket(newSocket);
 };
+
 
 
   // Clean up socket on unmount
