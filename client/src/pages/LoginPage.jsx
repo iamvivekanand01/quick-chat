@@ -1,4 +1,4 @@
-import React, { useContext, useState,useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import assets from "../assets/assets";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -27,7 +27,7 @@ const LoginPage = () => {
     });
   };
 
-   // Clear form fields when LoginPage loads (e.g., after logout)
+  // Clear form fields when LoginPage loads (e.g., after logout)
   useEffect(() => {
     setCurrState("Sign up");
     setFullName("");
@@ -127,10 +127,10 @@ to-violet-600 text-white rounded-md cursor-pointer"
               <span
                 onClick={() => {
                   setCurrState("login");
-   setFullName("");
-  setEmail("");
-  setPassword("");
-  setBio("");
+                  setFullName("");
+                  setEmail("");
+                  setPassword("");
+                  setBio("");
                   setIsDataSubmitted(false);
                 }}
                 className="font-medium text-violet-500 cursor-pointer"
@@ -143,13 +143,13 @@ to-violet-600 text-white rounded-md cursor-pointer"
               Create an account{" "}
               <span
                 onClick={() => {
-  setCurrState("Sign up");
-  setFullName("");
-  setEmail("");
-  setPassword("");
-  setBio("");
-  setIsDataSubmitted(false);
-}}
+                  setCurrState("Sign up");
+                  setFullName("");
+                  setEmail("");
+                  setPassword("");
+                  setBio("");
+                  setIsDataSubmitted(false);
+                }}
                 className="font-medium text-violet-500 cursor-pointer"
               >
                 Click here

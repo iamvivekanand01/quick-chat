@@ -1,29 +1,49 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import assets, { messagesDummyData } from "../assets/assets";
+import assets from "../assets/assets";
 import { formatMessageTime } from "../lib/utils";
 import { ChatContext } from "../../context/ChatContext";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import { socket } from "../socket"; // 🆕 Import socket instance
 
 const ChatContainer = () => {
   const { messages, selectedUser, setSelectedUser, sendMessage, getMessages } =
     useContext(ChatContext);
   const { authUser, onlineUsers } = useContext(AuthContext);
-  const currentUserId = "680f50e4f10f3cd28382ecf9";
 
   const scrollEnd = useRef();
 
   const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false); // 🆕
 
-  // Handle sending a message
+  // Emit typing event when user types
+  useEffect(() => {
+    if (selectedUser && input.trim()) {
+      socket.emit("typing", {
+        to: selectedUser._id,
+        from: authUser._id,
+      });
+    }
+  }, [input]);
+
+  // Listen for typing event
+  useEffect(() => {
+    socket.on("typing", (data) => {
+      if (selectedUser?._id === data.from) {
+        setIsTyping(true);
+        const timer = setTimeout(() => setIsTyping(false), 1000);
+        return () => clearTimeout(timer);
+      }
+    });
+  }, [selectedUser]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (input.trim() === "") return null;
+    if (input.trim() === "") return;
     await sendMessage({ text: input.trim() });
     setInput("");
   };
 
-  // Handle awnding an image
   const handleSendImage = async (e) => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith("image/")) {
@@ -117,6 +137,11 @@ const ChatContainer = () => {
             </div>
           </div>
         ))}
+        {isTyping && (
+          <p className="text-xs text-gray-400 italic px-3 mt-[-12px] mb-4">
+            typing...
+          </p>
+        )}
         <div ref={scrollEnd}></div>
       </div>
 
@@ -155,8 +180,8 @@ const ChatContainer = () => {
       </div>
     </div>
   ) : (
-    <div className="flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/10 max-md:hidden">
-      <img src={assets.logo_icon} className="max-w-16" alt="" />
+    <div className="flex flex-col items-center justify-center gap-3 text-gray-500 bg-white/10 max-md:hidden">
+      <img src={assets.logo_icon} className="max-w-16" alt="logo" />
       <p className="text-lg font-medium text-white">Chat anytime, anywhere</p>
     </div>
   );

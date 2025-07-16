@@ -5,8 +5,7 @@ import RightSidebar from "../components/RightSidebar";
 import { ChatContext } from "../../context/ChatContext";
 
 const HomePage = () => {
-  
-  const {selectedUser}=useContext(ChatContext);
+  const { selectedUser } = useContext(ChatContext);
   return (
     <div className="border w-full h-screen sm:px-[15%] sm:py-[5%]">
       <div
@@ -18,10 +17,13 @@ const HomePage = () => {
          }
         `}
       >
-        <Sidebar/>
-        <ChatContainer/>
+        <Sidebar />
+        <ChatContainer />
         <RightSidebar />
       </div>
+      <p className="absolute bottom-2 right-4 text-xs text-gray-500 hidden md:block z-50">
+        Built with 💙 by Vivekanand
+      </p>
     </div>
   );
 };

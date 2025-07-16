@@ -44,21 +44,18 @@ A real-time full-stack chat application built using the MERN stack (MongoDB, Exp
 
 ## 📁 Folder Structure
 
-\`\`\`
-client/
-├── src/
-├── public/
-├── .env
+quick-chat/
+├── client/ # React frontend
+│ ├── src/
+│ ├── public/
+│ └── .env # Frontend env variables
+├── server/ # Express backend
+│ ├── controllers/
+│ ├── models/
+│ ├── routes/
+│ ├── middleware/
+│ └── .env # Backend env variables
 └── README.md
-
-server/
-├── controllers/
-├── models/
-├── routes/
-├── middleware/
-├── .env
-└── server.js
-\`\`\`
 
 ---
 
@@ -92,27 +89,20 @@ CLOUDINARY_API_SECRET=your-api-secret
 
 ### 1. Clone the repo
 
-\`\`\`bash
 git clone https://github.com/iamvivekanand01/quick-chat.git
 cd quick-chat
 
-\`\`\`
-
 ### 2. Setup server
 
-\`\`\`bash
 cd server
 npm install
 npm run dev
-\`\`\`
 
 ### 3. Setup client
 
-\`\`\`bash
 cd client
 npm install
 npm run dev
-\`\`\`
 
 ---
 
@@ -129,16 +119,6 @@ Made with 💜 by **Vivekanand**
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://linkedin.com/in/iamvivekanand01)
 
 ---
-
-
-## ⚠️ Known Issue
-
-> 💡 You might see this warning in the browser console:
-WebSocket connection to 'wss://https/socket.io/?...' failed
-
-
-✅ This doesn't break functionality — messages, login, and all major features work. This is due to an internal Socket.IO connection formatting issue and will be patched soon.
-
 
 
 ## 📄 License

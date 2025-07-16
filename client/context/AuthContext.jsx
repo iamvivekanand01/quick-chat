@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-console.log("Loaded Backend URL from env:", backendUrl);
+console.log("Backend URL:", backendUrl);
 
 axios.defaults.baseURL = backendUrl;
 
@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
 
-  // Check if user is authenticated and if so, set the user data and connect the socket
+  // Check if user is authenticated and initialize socket
   const checkAuth = async () => {
     try {
       const { data } = await axios.get("/api/auth/check");
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login function to handle user authentication and socket connection
+  // Handle user login and store token
   const login = async (state, credentials) => {
     try {
       const { data } = await axios.post(`/api/auth/${state}`, credentials);
@@ -48,76 +48,68 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function to handle user logout and socket disconnection
+  // Logout user and clear state
   const logout = async () => {
     localStorage.removeItem("token");
     setToken(null);
     setAuthUser(null);
     setOnlineUsers([]);
     axios.defaults.headers.common["token"] = null;
-    toast.success("Logged out successfully");
+    toast.success("Logged out");
     if (socket) {
       socket.disconnect();
       setSocket(null);
     }
   };
 
+  // Update user profile
   const updateProfile = async (body) => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", body);
       if (data.success) {
         setAuthUser(data.user);
-        toast.success("Profile updated successfully");
+        toast.success("Profile updated");
       }
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  // Improved socket connection function
- const connectSocket = (userData) => {
-  if (!userData || socket?.connected) return;
+  // Connect to WebSocket with user ID
+  const connectSocket = (userData) => {
+    if (!userData || socket?.connected) return;
 
-  const baseURL = import.meta.env.VITE_BACKEND_URL?.trim();
+    const newSocket = io(backendUrl.trim(), {
+      query: { userId: userData._id },
+      transports: ["websocket"],
+    });
 
-  // Debugging logs
-  console.log("🟢 Connecting to socket at:", baseURL);
-  console.log("🟢 With userId:", userData._id);
+    newSocket.on("connect", () => {
+      console.log("WebSocket connected");
+    });
 
-  const newSocket = io(baseURL, {
-    query: { userId: userData._id },
-    transports: ["websocket"],
-  });
+    newSocket.on("connect_error", (err) => {
+      console.error("WebSocket error:", err.message);
+    });
 
-  newSocket.on("connect", () => {
-    console.log("✅ WebSocket connected!");
-  });
+    newSocket.on("getOnlineUsers", (userIds) => {
+      setOnlineUsers(userIds);
+    });
 
-  newSocket.on("connect_error", (err) => {
-    console.error("❌ WebSocket connect error:", err.message);
-  });
-
-  newSocket.on("getOnlineUsers", (userIds) => {
-    console.log("✅ Online users:", userIds);
-    setOnlineUsers(userIds);
-  });
-
-  setSocket(newSocket);
-};
-
-
-
-  // Clean up socket on unmount
-  useEffect(() => {
-  return () => {
-    if (socket?.connected) {
-      socket.disconnect();
-      console.log("Socket disconnected on unmount");
-    }
+    setSocket(newSocket);
   };
-}, []); // empty deps → only runs on unmount
 
+  // Disconnect socket when component unmounts
+  useEffect(() => {
+    return () => {
+      if (socket?.connected) {
+        socket.disconnect();
+        console.log("Socket disconnected");
+      }
+    };
+  }, []);
 
+  // Set token and check auth on mount
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common["token"] = token;
@@ -134,6 +126,6 @@ export const AuthProvider = ({ children }) => {
     updateProfile,
     login,
   };
-  
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
