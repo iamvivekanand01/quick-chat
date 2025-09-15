@@ -29,22 +29,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (action, credentials) => {
-    try {
-      const { data } = await axios.post(`/api/auth/${action}`, credentials);
-      if (data.success) {
-        setAuthUser(data.userData);
-        axios.defaults.headers.common["token"] = data.token;
-        setToken(data.token);
-        localStorage.setItem("token", data.token);
-        connectSocket(data.userData);
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error("Login failed. Please try again.");
+  try {
+    const { data } = await axios.post(`/api/auth/${action}`, credentials);
+    if (data.success) {
+      setAuthUser(data.userData);
+      axios.defaults.headers.common["token"] = data.token;
+      setToken(data.token);
+      localStorage.setItem("token", data.token);
+      connectSocket(data.userData);
+
+      toast.success(data.message);
+      return { success: true, user: data.userData };
+    } else {
+      toast.error(data.message);
+      return { success: false, message: data.message };
     }
-  };
+  } catch (error) {
+    toast.error("Login failed. Please try again.");
+    return { success: false, message: error.message };
+  }
+};
 
   const logout = () => {
     localStorage.removeItem("token");

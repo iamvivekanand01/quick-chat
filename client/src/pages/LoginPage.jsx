@@ -16,25 +16,26 @@ const LoginPage = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const onSubmitHandler = async (event) => {
-    event.preventDefault();
-    if (!acceptedTerms) return;
+const onSubmitHandler = async (event) => {
+  event.preventDefault();
+  if (!acceptedTerms) return;
 
-    if (currState === "Sign up" && !isDataSubmitted) {
-      setIsDataSubmitted(true);
-      return;
-    }
+  if (currState === "Sign up" && !isDataSubmitted) {
+    setIsDataSubmitted(true);
+    return;
+  }
 
-    await login(currState === "Sign up" ? "signup" : "login", {
-      fullName,
-      email,
-      password,
-      bio,
-    });
+  const result = await login(
+    currState === "Sign up" ? "signup" : "login",
+    { fullName, email, password, bio }
+  );
 
-    toast.success("Logged in successfully!");
+  if (result?.success) {
     navigate("/");
-  };
+  }
+};
+
+
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-black overflow-hidden">
